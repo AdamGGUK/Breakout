@@ -20,6 +20,7 @@ constexpr const char* WINDOW_TITLE = "Game";
 constexpr float PADDLE_WIDTH = 150.0f;
 constexpr float PADDLE_HEIGHT = 20.0f;
 constexpr float PADDLE_SPEED = 300.0f;
+constexpr float PADDLE_SPRINT = 600.0f;
 
 // Ball settings
 constexpr float BALL_RADIUS = 10.0f;

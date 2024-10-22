@@ -7,6 +7,7 @@
 #include "PowerupManager.h"
 #include "MessagingSystem.h"
 #include "UI.h"
+#include <windows.h>
 
 
 
@@ -16,8 +17,10 @@ public:
     void initialize();
     void update(float dt);
     void loseLife();
+    void increaseScore();
     void render();
     void levelComplete();
+    void nextLevel();
     void powerupEffect(POWERUPS pu, float t);
 
     Paddle* getPaddle() const;
@@ -33,11 +36,13 @@ private:
     float _time;
     float _timeLastPowerupSpawned;
     int _lives;
+    int _score;
     bool _levelComplete;
     std::pair<POWERUPS, float> _powerupInEffect;
 
     sf::Font _font;
     sf::Text _masterText;
+    sf::Text _scoreText;
 
     sf::RenderWindow* _window;
     Paddle* _paddle;

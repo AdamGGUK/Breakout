@@ -17,7 +17,7 @@ fire ball (green)
 
 ## Suggested fixes
 
-* Fix the compiler issues in the code
+* Fix the compiler issues in the code (Fixed circular dependency.)
 
 ## Suggested tasks
 
@@ -32,4 +32,7 @@ fire ball (green)
 * Implement commentary with calls to an LLM such as LLama
 
 # Time Details and Changelist
-<Add information to this section about the time you've taken for this task along with a professional changelist.>
+
+v 0.1: Fixed circular dependency & added score system. Time spent: 10 min.
+v 0.2: Added variable paddle speed & repeating level. Time spent: 15 min.
+

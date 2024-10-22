@@ -13,6 +13,14 @@ GameManager::GameManager(sf::RenderWindow* window)
     _masterText.setPosition(50, 400);
     _masterText.setCharacterSize(48);
     _masterText.setFillColor(sf::Color::Yellow);
+
+    _font.loadFromFile("font/montS.ttf");
+    _scoreText.setFont(_font);
+    _scoreText.setPosition(850, 700);
+    _scoreText.setCharacterSize(48);
+    _scoreText.setFillColor(sf::Color::Yellow);
+
+    _score = 0;
 }
 
 void GameManager::initialize()
@@ -33,6 +41,8 @@ void GameManager::update(float dt)
     _powerupInEffect = _powerupManager->getPowerupInEffect();
     _ui->updatePowerupText(_powerupInEffect);
     _powerupInEffect.second -= dt;
+
+    _scoreText.setString(std::to_string(_score));
     
 
     if (_lives <= 0)
@@ -54,6 +64,7 @@ void GameManager::update(float dt)
             _pause = true;
             _masterText.setString("paused.");
             _pauseHold = PAUSE_TIME_BUFFER;
+
         }
         if (_pause && _pauseHold <= 0.f)
         {
@@ -95,6 +106,11 @@ void GameManager::loseLife()
     // TODO screen shake.
 }
 
+void GameManager::increaseScore()
+{
+    _score += 10;
+}
+
 void GameManager::render()
 {
     _paddle->render();
@@ -102,12 +118,21 @@ void GameManager::render()
     _brickManager->render();
     _powerupManager->render();
     _window->draw(_masterText);
+    _window->draw(_scoreText);
     _ui->render();
 }
 
 void GameManager::levelComplete()
 {
     _levelComplete = true;
+    Sleep(5);
+    _levelComplete = false;
+    nextLevel();
+}
+
+void GameManager::nextLevel()
+{
+    GameManager::initialize();
 }
 
 sf::RenderWindow* GameManager::getWindow() const { return _window; }
