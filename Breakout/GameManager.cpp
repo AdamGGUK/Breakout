@@ -10,17 +10,19 @@ GameManager::GameManager(sf::RenderWindow* window)
 {
     _font.loadFromFile("font/montS.ttf");
     _masterText.setFont(_font);
-    _masterText.setPosition(50, 400);
+    _masterText.setPosition(230, 250);
     _masterText.setCharacterSize(48);
     _masterText.setFillColor(sf::Color::Yellow);
 
     _font.loadFromFile("font/montS.ttf");
     _scoreText.setFont(_font);
-    _scoreText.setPosition(850, 700);
+    _scoreText.setPosition(200, 350);
     _scoreText.setCharacterSize(48);
     _scoreText.setFillColor(sf::Color::Yellow);
 
     _score = 0;
+    _gameState = GameManager::_startMenu;
+    startMenu();
 }
 
 void GameManager::initialize()
@@ -36,18 +38,55 @@ void GameManager::initialize()
     _brickManager->createBricks(5, 10, 80.0f, 30.0f, 5.0f);
 }
 
+void GameManager::startNewGame()
+{
+    _score = 0;
+    _lives = 3;
+    _paddle = new Paddle(_window);
+    _brickManager = new BrickManager(_window, this);
+    _messagingSystem = new MessagingSystem(_window);
+    _ball = new Ball(_window, 400.0f, this);
+    _powerupManager = new PowerupManager(_window, _paddle, _ball);
+    _ui = new UI(_window, _lives, this);
+    _brickManager->createBricks(5, 10, 80.0f, 30.0f, 5.0f);
+    _scoreText.setPosition(850, 700);
+    _masterText.setString("");
+}
+
 void GameManager::update(float dt)
 {
     _powerupInEffect = _powerupManager->getPowerupInEffect();
     _ui->updatePowerupText(_powerupInEffect);
     _powerupInEffect.second -= dt;
 
+    if (_gameState == GameManager::_startMenu)
+    {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Return))
+        {
+            _gameState = GameState::_inGame;
+            startNewGame();
+        }
+    }
+
+    if (_gameState == GameManager::_gameOver)
+    {
+        if (sf::Keyboard::isKeyPressed(sf::Keyboard::Space))
+        {
+            startMenu();
+        }
+    }
+
+    if (_gameState == GameManager::_inGame)
+    {
     _scoreText.setString(std::to_string(_score));
+    }
     
 
-    if (_lives <= 0)
+    if (_lives <= 0 && _gameState == GameState::_inGame)
     {
-        _masterText.setString("Game over.");
+        _gameState = GameState::_gameOver;
+        _finalScore = _score;
+        gameOver();
         return;
     }
     if (_levelComplete)
@@ -57,7 +96,7 @@ void GameManager::update(float dt)
     }
     // pause and pause handling
     if (_pauseHold > 0.f) _pauseHold -= dt;
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::P))
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::P) && _gameState == GameState::_inGame)
     {
         if (!_pause && _pauseHold <= 0.f)
         {
@@ -66,7 +105,7 @@ void GameManager::update(float dt)
             _pauseHold = PAUSE_TIME_BUFFER;
 
         }
-        if (_pause && _pauseHold <= 0.f)
+        if (_pause && _pauseHold <= 0.f && _gameState != GameState::_startMenu)
         {
             _pause = false;
             _masterText.setString("");
@@ -93,9 +132,12 @@ void GameManager::update(float dt)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::A)) _paddle->moveLeft(dt);
 
     // update everything 
+    if (_gameState == GameState::_inGame)
+    {
     _paddle->update(dt);
     _ball->update(dt);
     _powerupManager->update(dt);
+    }
 }
 
 void GameManager::loseLife()
@@ -113,26 +155,41 @@ void GameManager::increaseScore()
 
 void GameManager::render()
 {
+    if (_gameState == GameState::_inGame)
+    {
     _paddle->render();
     _ball->render();
     _brickManager->render();
     _powerupManager->render();
+    _ui->render();
+    }
     _window->draw(_masterText);
     _window->draw(_scoreText);
-    _ui->render();
+}
+
+void GameManager::startMenu()
+{
+    _gameState = GameState::_startMenu;
+    _masterText.setString("Welcome to Breakout!");
+    _scoreText.setString("Press 'Backspace' to start.");
 }
 
 void GameManager::levelComplete()
 {
-    _levelComplete = true;
-    Sleep(5);
-    _levelComplete = false;
     nextLevel();
 }
 
 void GameManager::nextLevel()
 {
-    GameManager::initialize();
+    GameManager::startNewGame();
+}
+
+void GameManager::gameOver()
+{
+    _masterText.setString("Game over :(");
+    _scoreText.setString("Your score was : " + std::to_string(_finalScore));
+    _masterText.setPosition(230, 250);
+    _scoreText.setPosition(200, 350);
 }
 
 sf::RenderWindow* GameManager::getWindow() const { return _window; }

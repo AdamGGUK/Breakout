@@ -9,8 +9,6 @@
 #include "UI.h"
 #include <windows.h>
 
-
-
 class GameManager {
 public:
     GameManager(sf::RenderWindow* window);
@@ -22,6 +20,12 @@ public:
     void levelComplete();
     void nextLevel();
     void powerupEffect(POWERUPS pu, float t);
+    void startNewGame();
+    void startMenu();
+    void gameOver();
+
+    enum GameState {_startMenu, _inGame, _gameOver};
+    GameState _gameState;
 
     Paddle* getPaddle() const;
     BrickManager* getBrickManager() const;
@@ -37,6 +41,7 @@ private:
     float _timeLastPowerupSpawned;
     int _lives;
     int _score;
+    int _finalScore;
     bool _levelComplete;
     std::pair<POWERUPS, float> _powerupInEffect;
 

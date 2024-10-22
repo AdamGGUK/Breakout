@@ -35,4 +35,5 @@ fire ball (green)
 
 v 0.1: Fixed circular dependency & added score system. Time spent: 10 min.
 v 0.2: Added variable paddle speed & repeating level. Time spent: 15 min.
+v 0.3: Added game loop. Time spent: 45 min
 
